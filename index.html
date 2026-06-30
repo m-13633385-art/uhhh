@@ -3,286 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vet Ward: Anomaly</title>
+    <title>Vet Ward: Anomaly - Day Shift</title>
     <style>
         :root {
             --crt-green: #33ff33;
-            --bg-dark: #0a0a0a;
+            --bg-dark: #050505;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            background-color: black;
-            color: white;
+            margin: 0; padding: 0; background-color: black; color: white;
             font-family: 'Courier New', Courier, monospace;
-            height: 100%;
+            height: 100%; display: flex; justify-content: center; align-items: center;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        /* --- UI Screens --- */
         .screen {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            height: 600px;
-            border: 2px solid #333;
-            background-color: var(--bg-dark);
-            position: relative;
+            display: none; width: 100%; max-width: 800px; height: 600px;
+            border: 2px solid #333; background-color: var(--bg-dark); position: relative;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
-        .active {
-            display: flex;
-            flex-direction: column;
-        }
+        .active { display: flex; flex-direction: column; }
 
         h1 { text-align: center; color: darkred; text-shadow: 2px 2px 5px red; }
         
-        /* --- Main Menu & Multiplayer --- */
         .menu-container { padding: 50px; text-align: center; }
-        input[type="text"] {
-            padding: 10px; font-size: 16px; background: #222; color: white;
-            border: 1px solid #555; text-align: center; margin: 10px 0;
-        }
         button {
             padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer;
-            background-color: #333; color: white; border: 1px solid white;
-            transition: 0.2s;
+            background-color: #333; color: white; border: 1px solid white; transition: 0.2s;
         }
         button:hover { background-color: white; color: black; }
 
-        /* --- Game View --- */
-        .camera-feed {
-            flex-grow: 1;
-            position: relative;
-            background: #111;
-            border-bottom: 2px solid #444;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+        /* --- HUD & UI --- */
+        .hud {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between; z-index: 15;
+            color: var(--crt-green); text-shadow: 1px 1px 2px black; font-weight: bold;
         }
 
+        .instructions {
+            position: absolute; bottom: 10px; width: 100%; text-align: center;
+            color: #aaa; z-index: 15; background: rgba(0,0,0,0.7); padding: 5px 0;
+        }
+
+        /* --- Environments --- */
+        .environment {
+            flex-grow: 1; position: relative; display: flex;
+            justify-content: center; align-items: center; overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        #deskView { background: #1a1a1a; border: 10px solid #222; }
+        #cageView { background: #0a0a0a; border: 10px solid #444; display: none; }
+
+        .monitor-frame {
+            width: 400px; height: 300px; background: #000; border: 15px solid #333;
+            border-radius: 10px; position: relative; display: flex;
+            justify-content: center; align-items: center; box-shadow: 0 0 15px #000 inset;
+        }
+
+        /* --- Visual Effects --- */
         .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none; z-index: 10;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 10;
         }
 
-        .cam-text {
-            position: absolute; top: 10px; left: 10px; color: var(--crt-green); z-index: 11;
-        }
-
-        /* --- The Patient (Animal) --- */
-        .patient {
-            font-size: 100px;
-            transition: all 0.3s ease;
-        }
+        .patient { font-size: 120px; transition: all 0.2s ease; }
+        .monitor-patient { font-size: 60px; filter: grayscale(100%) contrast(150%); }
 
         /* --- Anomalies --- */
-        .anomaly-flicker { animation: flicker 0.5s infinite; }
+        .anomaly-flicker { animation: flicker 0.2s infinite; }
         @keyframes flicker {
-            0% { opacity: 1; background-color: #111; }
-            50% { opacity: 0.1; background-color: black; }
-            100% { opacity: 1; background-color: #300; }
+            0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; }
         }
 
         .anomaly-twitch { animation: twitch 0.1s infinite; }
         @keyframes twitch {
             0% { transform: translate(0, 0); }
-            25% { transform: translate(-5px, 5px); }
-            50% { transform: translate(5px, -5px); }
-            75% { transform: translate(-5px, -5px); }
-            100% { transform: translate(5px, 5px); }
+            50% { transform: translate(-10px, 10px); }
+            100% { transform: translate(10px, -10px); }
         }
-
-        /* --- Controls --- */
-        .controls {
-            height: 100px; display: flex; justify-content: space-around; align-items: center;
-            background: #050505;
-        }
-        
-        .shutter-btn {
-            background-color: darkred; border-color: red; font-weight: bold; font-size: 24px;
-        }
-        .shutter-btn:hover { background-color: red; }
 
         /* --- Shutter Animation --- */
         .shutter {
             position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
-            background: #222; border-bottom: 10px solid #555;
-            transition: top 0.2s ease-in-out; z-index: 20;
+            background: repeating-linear-gradient(0deg, #222, #222 10px, #111 10px, #111 20px);
+            border-bottom: 20px solid #555; transition: top 0.15s ease-in; z-index: 20;
         }
         .shutter.closed { top: 0; }
 
+        .alert-text { color: red; font-size: 24px; display: none; font-weight: bold; position: absolute; z-index: 30;}
     </style>
 </head>
 <body>
 
     <div id="menuScreen" class="screen active">
         <div class="menu-container">
-            <h1>WARD 4: ANOMALY</h1>
-            <p>Treat the normal animals. Close the shutter on the unnatural.</p>
-            
-            <hr>
-            <h3>Multiplayer Lobby</h3>
-            <input type="text" id="roomCode" placeholder="Enter Room Code" maxlength="6">
+            <h1>WARD 4: SHIFT WORK</h1>
+            <p>You are the night vet. Move between the monitor and the cages.</p>
+            <ul style="text-align: left; display: inline-block; color: #ccc;">
+                <li>Press <b>W</b> to walk to the Cage.</li>
+                <li>Press <b>S</b> to return to the Security Monitor.</li>
+                <li>Press <b>T</b> to Treat NORMAL animals.</li>
+                <li>Press <b>E</b> to drop the Shutter on ANOMALIES.</li>
+                <li>Do NOT shut the door on normal pets, or you will be fired.</li>
+            </ul>
             <br>
-            <button onclick="joinGame()">Join / Host Game</button>
-            <hr>
-            <button onclick="openShop()">Item Shop</button>
-        </div>
-    </div>
-
-    <div id="shopScreen" class="screen">
-        <div class="menu-container">
-            <h1>SHOP</h1>
-            <p>Credits: <span id="creditsDisplay">0</span></p>
-            <button onclick="buyItem('camera_upgrade')">Better Camera (50 CR)</button>
-            <button onclick="buyItem('treats')">Animal Treats (20 CR)</button>
-            <br><br>
-            <button onclick="showScreen('menuScreen')">Back to Menu</button>
+            <button onclick="startGame()">Start Night Shift</button>
         </div>
     </div>
 
     <div id="gameScreen" class="screen">
-        <div class="camera-feed" id="camFeed">
-            <div class="crt-overlay"></div>
-            <div class="cam-text">CAM 01 - RECOVERY WARD <br><span id="statusText">STATUS: NORMAL</span></div>
-            
-            <div class="patient" id="patientEmoji">🐶</div>
-            <div class="shutter" id="shutterElement"></div>
+        <div class="hud">
+            <span id="dayDisplay">DAY: 1</span>
+            <span id="treatedDisplay">Treated: 0/3</span>
+            <span id="creditsDisplay">Credits: 0 CR</span>
         </div>
-        
-        <div class="controls">
-            <button onclick="checkCamera()">Check Photos/Cameras</button>
-            <button class="shutter-btn" onmousedown="toggleShutter(true)" onmouseup="toggleShutter(false)">HOLD SHUTTER</button>
+
+        <div class="instructions" id="instructionText">
+            [W] Walk to Cage | [S] Check Monitor
+        </div>
+
+        <div id="alertMessage" class="alert-text">WRONG CHOICE!</div>
+
+        <div id="deskView" class="environment">
+            <div class="monitor-frame" id="monitorFeed">
+                <div class="crt-overlay"></div>
+                <div class="patient monitor-patient" id="patientMonitorEmoji">🐶</div>
+            </div>
+        </div>
+
+        <div id="cageView" class="environment">
+            <div class="patient" id="patientCageEmoji">🐶</div>
+            <div class="shutter" id="shutterElement"></div>
         </div>
     </div>
 
     <script>
-        // Game State Variables
+        // Game Variables
+        let day = 1;
+        let treatedToday = 0;
+        let requiredToAdvance = 3;
         let credits = 0;
+        
         let isAnomalyActive = false;
+        let currentView = 'desk'; // 'desk' or 'cage'
+        let actionCooldown = false;
         let anomalyTimer;
-        let gameLoop;
-        let patient = document.getElementById("patientEmoji");
-        let camFeed = document.getElementById("camFeed");
 
-        // Normal faces vs Anomaly faces
-        const normalFaces = ["🐶", "🐱", "🐰"];
-        const anomalyFaces = ["🐺", "👹", "💀", "👁️"];
+        // Visual Elements
+        const deskView = document.getElementById('deskView');
+        const cageView = document.getElementById('cageView');
+        const monitorEmoji = document.getElementById('patientMonitorEmoji');
+        const cageEmoji = document.getElementById('patientCageEmoji');
+        const shutter = document.getElementById('shutterElement');
+        const instructionText = document.getElementById('instructionText');
 
-        // Navigation
+        const normalFaces = ["🐶", "🐱", "🐰", "🐹"];
+        const anomalyFaces = ["🐺", "👹", "💀", "👁️", "🕷️"];
+
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
-        function openShop() {
-            document.getElementById('creditsDisplay').innerText = credits;
-            showScreen('shopScreen');
-        }
-
-        function buyItem(item) {
-            alert("Shop backend not connected. This would deduct credits and give you an item!");
-        }
-
-        function joinGame() {
-            let code = document.getElementById('roomCode').value;
-            if(!code) code = "SOLO";
-            alert("Connecting to server room: " + code + "... (Simulated)");
-            startGame();
-        }
-
-        // Gameplay Logic
         function startGame() {
+            day = 1;
+            treatedToday = 0;
+            credits = 0;
+            requiredToAdvance = 3;
+            updateHUD();
             showScreen('gameScreen');
-            resetPatient();
-            startGameLoop();
+            spawnNewPatient();
         }
 
-        function resetPatient() {
+        function updateHUD() {
+            document.getElementById('dayDisplay').innerText = `DAY: ${day}`;
+            document.getElementById('treatedDisplay').innerText = `Treated: ${treatedToday}/${requiredToAdvance}`;
+            document.getElementById('creditsDisplay').innerText = `Credits: ${credits} CR`;
+        }
+
+        function spawnNewPatient() {
+            actionCooldown = false;
             isAnomalyActive = false;
-            patient.className = "patient";
-            camFeed.classList.remove("anomaly-flicker");
-            patient.innerText = normalFaces[Math.floor(Math.random() * normalFaces.length)];
-            document.getElementById('statusText').innerText = "STATUS: MONITORING...";
-            document.getElementById('statusText').style.color = "var(--crt-green)";
-        }
-
-        function startGameLoop() {
-            // Randomly trigger an anomaly every 3 to 8 seconds
-            let randomDelay = Math.floor(Math.random() * 5000) + 3000;
-            gameLoop = setTimeout(triggerAnomaly, randomDelay);
-        }
-
-        function triggerAnomaly() {
-            if (isAnomalyActive) return; // Prevent overlapping anomalies
             
-            isAnomalyActive = true;
-            document.getElementById('statusText').innerText = "STATUS: UNKNOWN";
+            // Clean up effects
+            cageEmoji.classList.remove("anomaly-twitch");
+            cageView.classList.remove("anomaly-flicker");
+            monitorEmoji.classList.remove("anomaly-twitch");
+            deskView.classList.remove("anomaly-flicker");
+
+            // 40% chance for an anomaly
+            isAnomalyActive = Math.random() < 0.4;
             
-            // Pick a random anomaly type
-            let type = Math.floor(Math.random() * 3);
-            
-            if (type === 0) {
-                // Wrong Face Anomaly
-                patient.innerText = anomalyFaces[Math.floor(Math.random() * anomalyFaces.length)];
-            } else if (type === 1) {
-                // Twitching Anomaly
-                patient.classList.add("anomaly-twitch");
-            } else {
-                // Lighting/Flicker Anomaly
-                camFeed.classList.add("anomaly-flicker");
-            }
+            let currentFace = normalFaces[Math.floor(Math.random() * normalFaces.length)];
 
-            // You have 3 seconds to react before it attacks
-            anomalyTimer = setTimeout(jumpscare, 3000);
-        }
-
-        // Shutter Mechanic
-        function toggleShutter(isClosed) {
-            const shutter = document.getElementById("shutterElement");
-            if (isClosed) {
-                shutter.classList.add("closed");
-                checkSurvival();
-            } else {
-                shutter.classList.remove("closed");
-            }
-        }
-
-        function checkSurvival() {
             if (isAnomalyActive) {
-                // Successfully blocked the anomaly
-                clearTimeout(anomalyTimer);
-                credits += 10;
-                document.getElementById('statusText').innerText = "ANOMALY PURGED. +10 CR";
-                document.getElementById('statusText').style.color = "yellow";
+                // Decide anomaly type
+                let type = Math.floor(Math.random() * 3);
+                if (type === 0) currentFace = anomalyFaces[Math.floor(Math.random() * anomalyFaces.length)];
+                if (type === 1) { cageEmoji.classList.add("anomaly-twitch"); monitorEmoji.classList.add("anomaly-twitch"); }
+                if (type === 2) { cageView.classList.add("anomaly-flicker"); deskView.classList.add("anomaly-flicker"); }
+                
+                // You have 7 seconds to notice and react to an anomaly before it attacks
+                anomalyTimer = setTimeout(() => gameOver("The anomaly broke out of its cage!"), 7000);
+            }
+
+            monitorEmoji.innerText = currentFace;
+            cageEmoji.innerText = currentFace;
+        }
+
+        // --- KEYBOARD CONTROLS ---
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('gameScreen').classList.contains('active') && !actionCooldown) {
+                const key = e.key.toLowerCase();
+
+                // MOVEMENT
+                if (key === 'w' && currentView === 'desk') {
+                    currentView = 'cage';
+                    deskView.style.display = 'none';
+                    cageView.style.display = 'flex';
+                    instructionText.innerText = "[E] Shut Door | [T] Treat Patient | [S] Back to Monitor";
+                } 
+                else if (key === 's' && currentView === 'cage') {
+                    currentView = 'desk';
+                    cageView.style.display = 'none';
+                    deskView.style.display = 'flex';
+                    instructionText.innerText = "[W] Walk to Cage";
+                }
+
+                // ACTIONS (Only possible when at the Cage)
+                if (currentView === 'cage') {
+                    if (key === 'e') {
+                        executeAction('shut');
+                    } else if (key === 't') {
+                        executeAction('treat');
+                    }
+                }
+            }
+        });
+
+        // --- GAME LOGIC ---
+        function executeAction(actionType) {
+            actionCooldown = true;
+            clearTimeout(anomalyTimer);
+
+            if (actionType === 'shut') {
+                shutter.classList.add("closed");
                 
                 setTimeout(() => {
-                    resetPatient();
-                    startGameLoop();
-                }, 1500);
+                    if (isAnomalyActive) {
+                        // Correct Choice: Shut out an anomaly
+                        credits += 20;
+                        shutter.classList.remove("closed");
+                        nextPatient();
+                    } else {
+                        // Wrong Choice: Shut door on a normal animal
+                        gameOver("You crushed a normal pet with the shutter! You are fired.");
+                    }
+                }, 1000);
+
+            } else if (actionType === 'treat') {
+                if (!isAnomalyActive) {
+                    // Correct Choice: Treated normal animal
+                    credits += 10;
+                    treatedToday++;
+                    
+                    // Show a quick success effect
+                    cageEmoji.innerText = "✨" + cageEmoji.innerText + "✨";
+                    setTimeout(nextPatient, 1000);
+                } else {
+                    // Wrong Choice: Tried to treat an anomaly
+                    gameOver("You got too close to the anomaly. It attacked you!");
+                }
             }
         }
 
-        function jumpscare() {
-            const shutter = document.getElementById("shutterElement");
-            if (!shutter.classList.contains("closed")) {
-                alert("GAME OVER! The anomaly got you.");
-                clearTimeout(gameLoop);
-                showScreen('menuScreen');
+        function nextPatient() {
+            if (treatedToday >= requiredToAdvance) {
+                // Advance to next day
+                day++;
+                treatedToday = 0;
+                requiredToAdvance += 2; // Gets harder/longer each day
+                alert(`DAY ${day-1} COMPLETE! Get ready for Day ${day}.`);
             }
+            updateHUD();
+            
+            // Auto return to desk for the next patient
+            currentView = 'desk';
+            cageView.style.display = 'none';
+            deskView.style.display = 'flex';
+            instructionText.innerText = "[W] Walk to Cage";
+            
+            spawnNewPatient();
         }
 
-        function checkCamera() {
-            alert("Checking logs... The animal seems restless.");
+        function gameOver(reason) {
+            actionCooldown = true;
+            alert(`GAME OVER\n\n${reason}\n\nYou survived to Day ${day} with ${credits} Credits.`);
+            shutter.classList.remove("closed");
+            showScreen('menuScreen');
         }
     </script>
 </body>

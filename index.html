@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARD 4: ABSOLUTE INSANITY</title>
+    <title>WARD 4: COGNITIVE COLLAPSE</title>
     <style>
         :root {
             --crt-green: #33ff33;
             --crt-amber: #ffb000;
-            --bg-color: #020203;
-            --panel-bg: #0a0a0c;
+            --bg-color: #020204;
+            --panel-bg: #09090c;
             --alert-red: #ff0033;
         }
 
@@ -17,17 +17,18 @@
             margin: 0; padding: 0; background-color: var(--bg-color); color: white;
             font-family: 'Courier New', Courier, monospace; user-select: none;
             height: 100%; display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
         }
 
         .screen { display: none; width: 100%; max-width: 1150px; height: 750px; position: relative; }
         .active { display: flex; flex-direction: column; }
 
-        /* --- UI WORKSPACES --- */
+        /* --- UI WRAPPERS --- */
         .menu-wrapper {
-            background: #040406; border: 4px double #222; width: 100%; height: 100%;
+            background: #030305; border: 4px double #222; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        h1 { color: var(--alert-red); font-size: 46px; letter-spacing: 8px; text-shadow: 0 0 20px #500; margin: 0; }
+        h1 { color: var(--alert-red); font-size: 44px; letter-spacing: 8px; text-shadow: 0 0 20px #500; margin: 0; }
         .subtitle { color: #555; font-size: 13px; margin-bottom: 40px; letter-spacing: 2px; }
         .menu-box { background: var(--panel-bg); padding: 40px; border: 1px solid #222; width: 480px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
         
@@ -38,22 +39,23 @@
         button:hover:not(:disabled) { background: var(--crt-green); color: black; box-shadow: 0 0 15px var(--crt-green); border-color: var(--crt-green); }
         button:disabled { background: #050505; color: #222; border-color: #111; cursor: not-allowed; }
 
-        /* --- DASHBOARD HEADERS --- */
+        /* --- GAME ENGINE LAYOUT --- */
         .game-container {
             display: grid; grid-template-columns: 800px 1fr; grid-template-rows: 65px 1fr;
-            width: 100%; height: 100%; background: #000; border: 3px solid #15151c;
+            width: 100%; height: 100%; background: #000; border: 3px solid #1c1c28;
         }
 
         .header-bar {
-            grid-column: 1 / 3; background: #07070a; border-bottom: 2px solid #15151c;
+            grid-column: 1 / 3; background: #060609; border-bottom: 2px solid #1c1c28;
             display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font-size: 20px;
             color: var(--crt-green); text-shadow: 0 0 4px var(--crt-green); font-weight: bold;
         }
 
-        /* --- SIMULATED CCTV FEED --- */
+        /* --- VIDEO MONITOR --- */
         .camera-section {
-            position: relative; background: #010102; border-right: 2px solid #15151c;
+            position: relative; background: #010102; border-right: 2px solid #1c1c28;
             display: flex; justify-content: center; align-items: center; overflow: hidden;
+            transition: filter 0.2s ease;
         }
 
         .crt-overlay {
@@ -66,10 +68,10 @@
         .danger-alert { color: var(--alert-red); animation: pulse 0.4s infinite alternate; font-weight: bold; display: none; margin-left: 15px;}
         .record-dot { color: var(--alert-red); animation: blink 1s infinite; }
 
-        /* --- TARGET ENTITY --- */
+        /* --- ENTITY TARGET --- */
         .patient-display { font-size: 180px; position: relative; z-index: 5; transition: transform 0.05s; }
         
-        /* --- CORE VISUAL SCANNER --- */
+        /* --- DETECTOR SCANNER --- */
         .scanner-beam {
             position: absolute; top: -10px; left: 0; width: 100%; height: 20px;
             background: rgba(51, 255, 51, 0.3); box-shadow: 0 0 25px var(--crt-green);
@@ -79,7 +81,7 @@
 
         @keyframes scanMove { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
 
-        /* --- CRITICAL HORROR ANIMATIONS --- */
+        /* --- VISUAL DISTORTIONS --- */
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
         @keyframes pulse { 0% { opacity: 0.2; } 100% { opacity: 1; } }
         @keyframes microTwitch {
@@ -87,60 +89,58 @@
             50% { transform: translate(15px, -15px) rotate(6deg); } 75% { transform: translate(-12px, -8px) rotate(-6deg); }
             100% { transform: translate(0, 0); }
         }
-        @keyframes systemShatter {
-            0% { opacity: 1; background: #000; filter: hue-rotate(0deg); }
-            10% { opacity: 0.1; background: #200; }
-            20% { opacity: 0.8; filter: invert(1); }
-            30% { opacity: 0.2; }
-            40% { opacity: 1; filter: hue-rotate(180deg); }
-            100% { opacity: 1; background: #000; }
+        @keyframes screenShatter {
+            0% { opacity: 1; background: #000; filter: blur(0px); }
+            10% { opacity: 0.4; filter: blur(2px) hue-rotate(90deg); }
+            20% { opacity: 0.9; }
+            45% { opacity: 0.3; filter: blur(4px); }
+            100% { opacity: 1; background: #000; filter: blur(0px); }
         }
 
         .anim-twitch { animation: microTwitch 0.08s infinite !important; }
-        .anim-flicker { animation: systemShatter 0.15s infinite; }
+        .anim-flicker { animation: screenShatter 0.15s infinite; }
 
-        /* --- SYSTEM JAM / REBOOT OVERLAY --- */
+        /* --- CORRUPTION OVERLAY --- */
         .jam-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050000; color: var(--alert-red); z-index: 18;
+            background: #070101; color: var(--alert-red); z-index: 18;
             display: none; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 28px; font-weight: bold; font-family: monospace;
+            font-size: 28px; font-weight: bold;
         }
-        .jam-prompt { font-size: 16px; color: #666; margin-top: 15px; animation: blink 0.8s infinite; }
+        .jam-prompt { font-size: 16px; color: #555; margin-top: 15px; animation: blink 0.8s infinite; }
 
-        /* --- SIDE OPERATIONAL PANEL --- */
+        /* --- CONTROL STATION --- */
         .control-panel { background: var(--panel-bg); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
-        .cam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .cam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .cam-btn { padding: 12px 0; font-size: 14px; margin: 0; text-align: center; }
         .cam-btn.active-cam { background: var(--crt-green); color: black; font-weight: bold; border-color: var(--crt-green); }
 
-        .action-btn { font-size: 16px; padding: 16px; margin-top: 8px; border: 2px solid; font-weight: bold; }
+        .action-btn { font-size: 15px; padding: 15px; margin-top: 8px; border: 2px solid; font-weight: bold; }
         .btn-treat { border-color: #00ff00; color: #00ff00; }
         .btn-shut { border-color: var(--alert-red); color: var(--alert-red); }
         .btn-scan-action { border-color: cyan; color: cyan; }
 
-        /* --- INTEGRATED SCAN MATRIX --- */
-        .scanner-dash {
-            background: #030305; border: 1px solid #1a1a24; padding: 15px; margin: 10px 0;
-            font-size: 11px; color: #666; line-height: 1.6;
-        }
+        .coffee-panel { background: #000; border: 1px solid #222; padding: 12px; margin-bottom: 10px; text-align: center; border-radius: 4px; }
+        .coffee-title { font-size: 11px; color: #555; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
+        .coffee-status { font-size: 16px; font-weight: bold; color: var(--crt-amber); }
+
+        .scanner-dash { background: #030305; border: 1px solid #181822; padding: 12px; margin: 8px 0; font-size: 11px; color: #555; line-height: 1.6; }
         .dash-line { display: flex; justify-content: space-between; margin-bottom: 4px; }
         .val-clear { color: var(--crt-green); font-weight: bold; }
         .val-anomaly { color: var(--alert-red); font-weight: bold; animation: blink 0.4s infinite; }
 
-        .ref-photo { padding: 10px; background: #020203; border: 1px solid #15151c; text-align: center; color: #444; font-size: 11px; }
-        .ref-emoji { font-size: 36px; margin-top: 4px; filter: grayscale(100%) opacity(0.3); }
+        .ref-photo { padding: 8px; background: #020203; border: 1px solid #12121a; text-align: center; color: #444; font-size: 11px; }
+        .ref-emoji { font-size: 34px; margin-top: 4px; filter: grayscale(100%) opacity(0.3); }
 
-        /* --- AUTOMATED SHUTTER ASSEMBLY --- */
         .shutter-door {
             position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, #101015 0%, #050508 95%, #33ff33 100%);
-            border-bottom: 20px solid #222; z-index: 25; transition: top 0.1s ease-in;
+            background: linear-gradient(180deg, #0d0d12 0%, #040406 95%, var(--alert-red) 100%);
+            border-bottom: 25px solid #111; z-index: 25; transition: top 0.1s ease-in;
         }
         .shutter-door.closed { top: 0; }
         
         .sys-toast {
-            position: absolute; z-index: 30; font-size: 22px; font-weight: bold;
+            position: absolute; z-index: 30; font-size: 20px; font-weight: bold;
             background: black; padding: 12px 25px; border: 2px solid; display: none;
             text-align: center; box-shadow: 0 0 25px rgba(0,0,0,0.9);
         }
@@ -149,20 +149,65 @@
             background: rgba(255, 0, 51, 0.15); border: 1px solid var(--alert-red); padding: 8px;
             color: #ff6666; font-size: 11px; font-weight: bold; text-align: center; margin-bottom: 10px;
         }
+
+        /* ==========================================================================
+           🚨 NEW SYSTEM DEFICIENCIES: JUMPSCARE & DEATH SCREEN GRAPHICS
+           ========================================================================== */
+        .scare-overlay {
+            position: fixed; top:0; left:0; width:100vw; height:100vh;
+            background: black; z-index: 9999; display: none;
+            justify-content: center; align-items: center;
+            animation: flashStrobe 0.05s infinite alternate;
+        }
+        #scareMonster { font-size: 550px; animation: violentShake 0.05s infinite; }
+
+        @keyframes flashStrobe {
+            0% { background: #000; filter: invert(0); }
+            50% { background: #1a0000; }
+            100% { background: #500; filter: invert(1); }
+        }
+        @keyframes violentShake {
+            0% { transform: translate(10px, 15px) scale(1); }
+            20% { transform: translate(-20px, 20px) scale(1.1); }
+            40% { transform: translate(15px, -15px) rotate(5deg); }
+            60% { transform: translate(-15px, 10px) rotate(-5deg); }
+            80% { transform: translate(25px, 25px) scale(0.9); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .death-screen {
+            background: #000; width: 100%; height: 100%; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            border: 4px solid var(--alert-red); box-shadow: inset 0 0 100px rgba(255,0,0,0.4);
+        }
+        .death-screen h2 {
+            font-size: 82px; color: var(--alert-red); letter-spacing: 12px; margin: 0;
+            text-shadow: 0 0 30px #ff0000, 0 0 60px #500;
+            animation: slowPulse 3s infinite alternate;
+        }
+        .death-log { font-size: 16px; color: #777; margin: 25px 0 50px 0; max-width: 600px; text-align: center; line-height: 1.8; }
+        .death-btn { width: auto; min-width: 250px; border-color: var(--alert-red); color: var(--alert-red); padding: 16px 30px; }
+        .death-btn:hover { background: var(--alert-red) !important; color: white !important; box-shadow: 0 0 20px var(--alert-red) !important; }
+
+        @keyframes slowPulse { 0% { opacity: 0.8; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1.02); } }
     </style>
 </head>
 <body>
 
+    <div id="jumpscareScreen" class="scare-overlay">
+        <div id="scareMonster">👹</div>
+    </div>
+
     <div id="mainMenu" class="screen active">
         <div class="menu-wrapper">
-            <h1>WARD 4: SYSTEM BREAKDOWN</h1>
-            <div class="subtitle">CRITICAL FACILITY HARDENING IN PROGRESS</div>
+            <h1>WARD 4: METASTASIS</h1>
+            <div class="subtitle">COGNITIVE COMPROMISE PROTOTYPE PROTOCOL</div>
             <div class="menu-box">
-                <button onclick="switchScreen('shopMenu')">ACCESS PROPERTY LOCKER</button>
+                <button onclick="switchScreen('shopMenu')">LOG OUT TO PROPERTY COUPLER</button>
                 <div style="margin: 15px 0; border: 1px dashed #333; padding: 15px; background: #000;">
-                    <div style="font-size: 11px; color: #555; margin-bottom: 10px;">ENCRYPTED SECTOR LOBBY MOCK</div>
-                    <input type="text" id="serverCode" placeholder="SYS_CONFIG_HEX" style="width: 75%; padding: 10px; background: #08080c; color: var(--alert-red); border: 1px solid #222; text-align: center; font-family: monospace; font-size: 15px;">
-                    <button onclick="startGame()" style="margin-top: 12px;">EXECUTE DEPLOYMENT</button>
+                    <div style="font-size: 11px; color: #555; margin-bottom: 10px;">ENCRYPTED MULTIPLAYER MATRIX SIMULATION</div>
+                    <input type="text" id="serverCode" placeholder="COGNITIVE_HASH_HEX" style="width: 75%; padding: 10px; background: #08080c; color: var(--alert-red); border: 1px solid #222; text-align: center; font-family: monospace; font-size: 15px;">
+                    <button onclick="startGame()" style="margin-top: 12px;">ENGAGE PROTOCOL SHIFT</button>
                 </div>
             </div>
         </div>
@@ -170,14 +215,14 @@
 
     <div id="shopMenu" class="screen">
         <div class="menu-wrapper">
-            <h1 style="color: var(--crt-amber); text-shadow: 0 0 10px rgba(255,176,0,0.3);">MARKETPLACE HARDWARE</h1>
+            <h1 style="color: var(--crt-amber); text-shadow: 0 0 10px rgba(255,176,0,0.3)">FACILITY STOCKPILE</h1>
             <div class="menu-box">
-                <h3 style="color: var(--crt-green)">Firmware Allocation: <span id="shopCredits">0</span> CR</h3>
+                <h3 style="color: var(--crt-green)">Accrued Capital: <span id="shopCredits">0</span> CR</h3>
                 <hr style="border-color: #15151c;">
                 <button id="btnBuyScanner" onclick="buyItem('scanner', 20)">Buy Core Bio-Scanner Mod (20 CR)</button>
-                <button id="btnBuyRegen" onclick="buyItem('regen', 60)">Buy Grid Core Optimizer [Slower Power Drain] (60 CR)</button>
+                <button id="btnBuyRegen" onclick="buyItem('regen', 50)">Buy Commercial Coffee Percolator [Brews 50% Faster] (50 CR)</button>
                 <p id="shopMsg" style="color: #666; min-height: 18px; margin: 10px 0; font-size: 12px;"></p>
-                <button onclick="switchScreen('mainMenu')" style="margin-top: 20px; border-color: #333;">DISCONNECT</button>
+                <button onclick="switchScreen('mainMenu')" style="margin-top: 20px; border-color: #333;">RE-ESTABLISH CONNECTION</button>
             </div>
         </div>
     </div>
@@ -188,7 +233,7 @@
             <div class="header-bar">
                 <span id="hudNight">SHIFT: 1</span>
                 <span id="hudTime">12:00 AM</span>
-                <span id="hudPower" style="color: var(--crt-amber);">POWER GRID: 100%</span>
+                <span id="hudSanity" style="color: pink;">SANITY CORE: 100%</span>
                 <span id="hudCredits">CREDITS: 0 CR</span>
             </div>
 
@@ -198,24 +243,29 @@
                 
                 <div class="cam-label">
                     <span class="record-dot">●</span> <span id="camText">CAM 01 // AREA A</span>
-                    <span class="danger-alert" id="hudDanger">⚠️ BREACH DETECTED</span>
+                    <span class="danger-alert" id="hudDanger">⚠️ BRAIN STRAIN DETECTED</span>
                 </div>
                 
                 <div class="jam-overlay" id="jamScreen">
-                    <div>[FEED CORRUPTED]</div>
-                    <div class="jam-prompt">MASH [R] KEY TO REBOOT ROUTER (<span id="jamProgress">0</span>%)</div>
+                    <div>[FEED OVERRIDDEN]</div>
+                    <div class="jam-prompt">MASH [R] TO CLEAR CCTV CONNECTOR (<span id="jamProgress">0</span>%)</div>
                 </div>
 
                 <div class="patient-display" id="patientEntity">🐶</div>
                 <div class="shutter-door" id="shutter"></div>
                 
-                <div class="sys-toast" id="toastMessage">CONSOLE LOG</div>
+                <div class="sys-toast" id="toastMessage">STATION FEED</div>
             </div>
 
             <div class="control-panel">
                 <div>
                     <div id="insanityWarning" class="danger-zone-alert" style="display:none;">
-                        💀 NIGHTMARE MATRIX ACTIVE 💀<br>EXPECT IMMEDIATE PARALLEL BREAKS
+                        💀 AGGRESSIVE COGNITIVE SHIFT ACTIVE 💀<br>PSYCHE BREAK REACTION WINDOW COMPRESSED
+                    </div>
+
+                    <div class="coffee-panel">
+                        <div class="coffee-title">Breakroom Fluid Pump</div>
+                        <div class="coffee-status" id="coffeeDisplay">🫙 EMPTY [C to Brew]</div>
                     </div>
 
                     <div class="cam-grid">
@@ -226,21 +276,21 @@
                     </div>
 
                     <div class="scanner-dash">
-                        <div style="text-align: center; border-bottom: 1px solid #15151c; padding-bottom: 4px; margin-bottom: 6px; font-weight: bold; color: #aaa;">BIOSTATISTICAL METRICS</div>
-                        <div class="dash-line"><span>CELL MUTATION:</span> <span id="scanDna">OFFLINE</span></div>
-                        <div class="dash-line"><span>MOTOR REFLEXES:</span> <span id="scanNeuro">OFFLINE</span></div>
-                        <div class="dash-line"><span>LUX DISCREPANCY:</span> <span id="scanLumen">OFFLINE</span></div>
+                        <div style="text-align: center; border-bottom: 1px solid #181822; padding-bottom: 4px; margin-bottom: 6px; font-weight: bold; color: #888;">BIOMETRIC INTEGRITY PROFILE</div>
+                        <div class="dash-line"><span>STRUCTURAL SHIFT:</span> <span id="scanDna">OFFLINE</span></div>
+                        <div class="dash-line"><span>REFLEX SPASM:</span> <span id="scanNeuro">OFFLINE</span></div>
+                        <div class="dash-line"><span>LUMEN BREAKRATE:</span> <span id="scanLumen">OFFLINE</span></div>
                     </div>
 
-                    <button class="action-btn btn-scan-action" id="btnScanner" onclick="executeScan()" disabled>RUN BIO-SCAN [Space]</button>
+                    <button class="action-btn btn-scan-action" id="btnScanner" onclick="executeScan()" disabled>RUN WAVE DEVIATION [Space]</button>
                 </div>
 
                 <div>
-                    <button class="action-btn btn-treat" onclick="handleAction('treat')">EXECUTE REMEDY [T]</button>
-                    <button class="action-btn btn-shut" onclick="handleAction('shut')">ENGAGE CONCEALMENT [E]</button>
+                    <button class="action-btn btn-treat" onclick="handleAction('treat')">APPLY VACCINE UNIT [T]</button>
+                    <button class="action-btn btn-shut" onclick="handleAction('shut')">SLAM METALLIC SHUTTER [E]</button>
 
-                    <div class="ref-photo" style="margin-top: 12px;">
-                        <div>ARCHIVED BLUEPRINT FILE</div>
+                    <div class="ref-photo" style="margin-top: 10px;">
+                        <div>ARCHIVE PARADIGM DATA</div>
                         <div class="ref-emoji" id="referencePhoto">🐶</div>
                     </div>
                 </div>
@@ -249,12 +299,20 @@
         </div>
     </div>
 
+    <div id="deathScreen" class="screen death-screen">
+        <h2>YOU DIED</h2>
+        <div class="death-log" id="deathReason">SYSTEM REPORT MISSING.</div>
+        <button class="death-btn" onclick="switchScreen('mainMenu')">REBOOT TERMINAL MAINBOARD</button>
+    </div>
+
     <script>
         let state = {
-            credits: 0, night: 1, time: 12, power: 100,
+            credits: 0, night: 1, time: 12, sanity: 100,
             hasScanner: false, optimizedRegen: false, isScanning: false,
             currentCam: 1, isGameOver: false,
-            clockInterval: null, AIInterval: null, powerInterval: null
+            coffeeState: "empty", 
+            brewProgress: 0,
+            clockInterval: null, AIInterval: null, psychicInterval: null
         };
 
         const normalAnimals = ["🐶", "🐱", "🐰", "🐹", "🦊", "🐼", "🦁"];
@@ -271,7 +329,7 @@
             screens: document.querySelectorAll('.screen'),
             time: document.getElementById('hudTime'),
             night: document.getElementById('hudNight'),
-            power: document.getElementById('hudPower'),
+            sanity: document.getElementById('hudSanity'),
             credits: document.getElementById('hudCredits'),
             shopCredits: document.getElementById('shopCredits'),
             patient: document.getElementById('patientEntity'),
@@ -285,9 +343,14 @@
             jamProgress: document.getElementById('jamProgress'),
             btnScanner: document.getElementById('btnScanner'),
             nWarning: document.getElementById('insanityWarning'),
+            coffee: document.getElementById('coffeeDisplay'),
             scanDna: document.getElementById('scanDna'),
             scanNeuro: document.getElementById('scanNeuro'),
-            scanLumen: document.getElementById('scanLumen')
+            scanLumen: document.getElementById('scanLumen'),
+            // New Horror DOM elements
+            jumpscare: document.getElementById('jumpscareScreen'),
+            scareMonster: document.getElementById('scareMonster'),
+            deathLog: document.getElementById('deathReason')
         };
 
         function switchScreen(id) {
@@ -303,45 +366,45 @@
                 ui.shopCredits.innerText = state.credits;
                 if (item === 'scanner') { state.hasScanner = true; document.getElementById('btnBuyScanner').disabled = true; }
                 if (item === 'regen') { state.optimizedRegen = true; document.getElementById('btnBuyRegen').disabled = true; }
-                msg.innerText = "UPGRADE LOGGED TO STATION MATRIX.";
+                msg.innerText = "UPGRADE LOGGED ENTIRELY TO SUB-SYSTEMS.";
                 msg.style.color = "var(--crt-green)";
             } else {
-                msg.innerText = "TRANSACTION ERROR: INSUFFICIENT ALLOCATION.";
+                msg.innerText = "ACCESS REJECTED: INSUFFICIENT FIRMWARE ALLOCATION.";
                 msg.style.color = "var(--alert-red)";
             }
         }
 
         function startGame() {
-            state.time = 12; state.power = 100; state.isGameOver = false; state.isScanning = false;
+            state.time = 12; state.sanity = 100; state.isGameOver = false; state.isScanning = false;
+            state.coffeeState = "empty"; state.brewProgress = 0;
             ui.night.innerText = `SHIFT: ${state.night}`;
             ui.credits.innerText = `CREDITS: ${state.credits} CR`;
             ui.btnScanner.disabled = !state.hasScanner;
+            ui.jumpscare.style.display = "none";
 
             if (state.night >= 5) {
                 ui.nWarning.style.display = "block";
                 document.getElementById("gameFrame").style.borderColor = "var(--alert-red)";
             } else {
                 ui.nWarning.style.display = "none";
-                document.getElementById("gameFrame").style.borderColor = "#15151c";
+                document.getElementById("gameFrame").style.borderColor = "#1c1c28";
             }
             
             generateRooms();
             switchScreen('gameScreen');
             clearReadout();
+            updateCoffeeUI();
             updateDisplay();
             
-            // Core Clock tick (1 hr = 12 seconds real-time)
             clearInterval(state.clockInterval);
             state.clockInterval = setInterval(advanceTime, 12000);
 
-            // AI Deployment Frequency Loop
             clearInterval(state.AIInterval);
             let loopSpeed = state.night >= 5 ? 1500 : 4000 - (state.night * 500);
             state.AIInterval = setInterval(directorAILoop, loopSpeed);
 
-            // Power Drain Loop Ticks
-            clearInterval(state.powerInterval);
-            state.powerInterval = setInterval(managePowerGrid, 1000);
+            clearInterval(state.psychicInterval);
+            state.psychicInterval = setInterval(manageBrainSync, 200);
         }
 
         function advanceTime() {
@@ -352,21 +415,76 @@
             if (state.time === 6) winNight();
         }
 
-        function managePowerGrid() {
+        function manageBrainSync() {
             if (state.isGameOver) return;
 
-            // Idle camera draw + shutter costs
-            let totalDrain = 1;
-            if (document.getElementById('shutter').classList.contains('closed')) totalDrain += 4;
-            if (state.isScanning) totalDrain += 3;
-            if (state.optimizedRegen) totalDrain -= 0.5;
+            let drain = 0.10; 
+            if (document.getElementById('shutter').classList.contains('closed')) drain += 0.40; 
+            if (state.isScanning) drain += 0.15;
 
-            state.power -= totalDrain;
-            if (state.power < 0) state.power = 0;
-            ui.power.innerText = `POWER GRID: ${Math.floor(state.power)}%`;
+            let uncontainedThreat = false;
+            for(let i = 1; i <= 4; i++) {
+                if (rooms[i].isAnomaly && !rooms[i].isJammed) uncontainedThreat = true;
+            }
+            if (uncontainedThreat) drain += 0.35;
 
-            if (state.power <= 0) {
-                gameOver("POWER SYSTEM COLLAPSED. Facility life support and security doors dropped offline.");
+            state.sanity -= drain;
+            if (state.sanity < 0) state.sanity = 0;
+            ui.sanity.innerText = `SANITY CORE: ${Math.floor(state.sanity)}%`;
+
+            if (state.sanity < 35) {
+                let jitterX = (Math.random() - 0.5) * 8;
+                let jitterY = (Math.random() - 0.5) * 8;
+                let blur = Math.max(0, (35 - state.sanity) / 6);
+                ui.patient.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+                ui.camViewport.style.filter = `blur(${blur}px) hue-rotate(${Math.sin(Date.now()/500)*15}deg)`;
+            } else {
+                ui.patient.style.transform = `none`;
+                ui.camViewport.style.filter = "none";
+            }
+
+            if (state.sanity <= 0) {
+                triggerGameOverTerminal("COGNITIVE DISSOLUTION COMPLETE. Your mind turned completely to static due to prolonged sensory stress.", false);
+            }
+
+            if (state.coffeeState === "brewing") {
+                let increment = state.optimizedRegen ? 3.5 : 1.7; 
+                state.brewProgress += increment;
+                if (state.brewProgress >= 100) {
+                    state.brewProgress = 100;
+                    state.coffeeState = "ready";
+                    showToast("COFFEE UNIT READY", "var(--crt-green)");
+                }
+                updateCoffeeUI();
+            }
+        }
+
+        function triggerCoffeeProcess() {
+            if (state.isGameOver) return;
+
+            if (state.coffeeState === "empty") {
+                state.coffeeState = "brewing";
+                state.brewProgress = 0;
+                showToast("PUMPING FLUIDS...", "cyan");
+            } else if (state.coffeeState === "ready") {
+                state.sanity = Math.min(100, state.sanity + 40);
+                state.coffeeState = "empty";
+                state.brewProgress = 0;
+                showToast("CONSUMED: +40% COGNITIVE INTEGRITY", "pink");
+            }
+            updateCoffeeUI();
+        }
+
+        function updateCoffeeUI() {
+            if (state.coffeeState === "ready") {
+                ui.coffee.innerText = "☕ READY [Press C]";
+                ui.coffee.style.color = "pink";
+            } else if (state.coffeeState === "brewing") {
+                ui.coffee.innerText = `⏳ ESCAPEMENT (${Math.floor(state.brewProgress)}%)`;
+                ui.coffee.style.color = "var(--crt-amber)";
+            } else {
+                ui.coffee.innerText = "🫙 DRY VENT [Press C]";
+                ui.coffee.style.color = "#444";
             }
         }
 
@@ -377,12 +495,11 @@
             let room = rooms[targetId];
 
             if (!room.isAnomaly) {
-                let spawnChance = state.night >= 5 ? 0.85 : 0.25 + (state.night * 0.10);
+                let spawnChance = state.night >= 5 ? 0.85 : 0.20 + (state.night * 0.12);
                 
                 if (Math.random() < spawnChance) {
                     room.isAnomaly = true;
                     
-                    // High-tier shifts jam camera feed hardware automatically
                     if (state.night >= 3 && Math.random() > 0.4) {
                         room.isJammed = true;
                         room.jamPct = 0;
@@ -398,11 +515,12 @@
                         room.type = "flicker";
                     }
 
-                    // Calculation for aggressive containment window
                     let timeWindow = Math.max(1800, 7000 - (state.night * 1100)); 
 
                     room.killTimer = setTimeout(() => { 
-                        gameOver(`Breach occurred on Cam ${targetId}. Subject escaped containment parameters.`); 
+                        // Let specific profile escape jumpscare execute
+                        let chosenFace = room.type === "face" ? room.currentDisplay : "👁️";
+                        triggerGameOverTerminal(`CONTAINMENT COLLAPSE IN CAMERA 0${targetId}. The subject tore down the internal magnetic door and compromised your desk station.`, true, chosenFace); 
                     }, timeWindow);
 
                     if (state.currentCam === targetId) updateDisplay();
@@ -433,7 +551,6 @@
             ui.camText.innerText = `CAM 0${id} // AREA ${String.fromCharCode(64 + id)}`;
             clearReadout();
             updateDisplay();
-            state.power -= 0.5; // Switch cost penalty
         }
 
         function updateDisplay() {
@@ -441,7 +558,6 @@
             ui.patient.className = "patient-display";
             ui.camViewport.classList.remove("anim-flicker");
             
-            // Toggle router jamming visual systems
             if (room.isJammed) {
                 ui.jamScreen.style.display = "flex";
                 ui.jamProgress.innerText = room.jamPct;
@@ -468,9 +584,9 @@
             ui.btnScanner.disabled = true;
             ui.camViewport.classList.add("scanning");
             
-            ui.scanDna.innerText = "CALIBRATING..."; ui.scanDna.style.color = "cyan";
-            ui.scanNeuro.innerText = "CALIBRATING..."; ui.scanNeuro.style.color = "cyan";
-            ui.scanLumen.innerText = "CALIBRATING..."; ui.scanLumen.style.color = "cyan";
+            ui.scanDna.innerText = "PARSING DATA..."; ui.scanDna.style.color = "cyan";
+            ui.scanNeuro.innerText = "PARSING DATA..."; ui.scanNeuro.style.color = "cyan";
+            ui.scanLumen.innerText = "PARSING DATA..."; ui.scanLumen.style.color = "cyan";
 
             setTimeout(() => {
                 ui.camViewport.classList.remove("scanning");
@@ -480,18 +596,18 @@
                 let room = rooms[state.currentCam];
                 
                 if (room.isAnomaly) {
-                    ui.scanDna.innerText = room.type === "face" ? "MUTATED PROFILE" : "NOMINAL";
+                    ui.scanDna.innerText = room.type === "face" ? "ORGANIC DEVIATION" : "STEADY";
                     ui.scanDna.className = room.type === "face" ? "val-anomaly" : "val-clear";
                     
-                    ui.scanNeuro.innerText = room.type === "twitch" ? "NEUROLOGICAL VOLTAGE SPIKE" : "NOMINAL";
+                    ui.scanNeuro.innerText = room.type === "twitch" ? "SPASMODIC SYMPTOM" : "STEADY";
                     ui.scanNeuro.className = room.type === "twitch" ? "val-anomaly" : "val-clear";
                     
-                    ui.scanLumen.innerText = room.type === "flicker" ? "WAVELENGTH DROP IN ROOM" : "NOMINAL";
+                    ui.scanLumen.innerText = room.type === "flicker" ? "WAVE PATTERN OSCILLATION" : "STEADY";
                     ui.scanLumen.className = room.type === "flicker" ? "val-anomaly" : "val-clear";
                 } else {
-                    ui.scanDna.innerText = "NOMINAL"; ui.scanDna.className = "val-clear";
-                    ui.scanNeuro.innerText = "NOMINAL"; ui.scanNeuro.className = "val-clear";
-                    ui.scanLumen.innerText = "NOMINAL"; ui.scanLumen.className = "val-clear";
+                    ui.scanDna.innerText = "STEADY"; ui.scanDna.className = "val-clear";
+                    ui.scanNeuro.innerText = "STEADY"; ui.scanNeuro.className = "val-clear";
+                    ui.scanLumen.innerText = "STEADY"; ui.scanLumen.className = "val-clear";
                 }
             }, 1000);
         }
@@ -509,20 +625,22 @@
             if (action === 'shut') {
                 triggerShutterDrop();
                 if (room.isAnomaly) {
-                    showToast("CONTAINMENT PURGE EXECUTED", "#00ff00");
+                    showToast("CONCEALMENT WALL FIRED", "#00ff00");
                     state.credits += (state.night >= 5 ? 50 : 25);
                     clearRoomState(state.currentCam);
                 } else {
-                    gameOver("SYSTEM VIOLATION. You dropped a hydraulic blast shield onto a valid domestic animal.");
+                    triggerGameOverTerminal("ILLEGAL DISCHARGE. You dropped a 4-ton hydraulic blast shield directly onto a healthy, uncorrupted animal.", false);
                 }
             } 
             else if (action === 'treat') {
                 if (!room.isAnomaly) {
-                    showToast("MEDICATION DISPENSED", "#00ff00");
+                    showToast("INJECTION ADMINISTERED", "#00ff00");
                     state.credits += 15;
                     clearRoomState(state.currentCam);
                 } else {
-                    gameOver("CRITICAL INCIDENT. You unlocked the cage security system to vaccinate an active anomaly.");
+                    // 🚨 JUMPSCARE TRIGGERED BY BAD TREATMENT 🚨
+                    let monsterFace = room.type === "face" ? room.currentDisplay : "💀";
+                    triggerGameOverTerminal("FATAL ASSESSMENT INCIDENT. You unlocked the secondary automated cell gate to inject medication into an active Anomaly. It immediately lunged through the open port.", true, monsterFace);
                 }
             }
             ui.credits.innerText = `CREDITS: ${state.credits} CR`;
@@ -539,10 +657,11 @@
             setTimeout(() => { updateDisplay(); clearReadout(); }, 600);
         }
 
-        function triggerShutterDrop() {
+        function shutterResetGate() {
             ui.shutter.classList.add("closed");
             setTimeout(() => ui.shutter.classList.remove("closed"), 1200);
         }
+        var triggerShutterDrop = shutterResetGate;
 
         function showToast(text, color) {
             ui.toast.innerText = text;
@@ -555,33 +674,56 @@
         function winNight() {
             clearInterval(state.clockInterval);
             clearInterval(state.AIInterval);
-            clearInterval(state.powerInterval);
-            alert(`--- RECOVERY MATRIX TERMINATED: 06:00 AM ---\nShift ${state.night} completely verified. Moving parameters forward.`);
+            clearInterval(state.psychicInterval);
+            alert(`--- CONSCIOUS SHIFT LOGGED: 06:00 AM ---\nShift ${state.night} structural integrity validated. Updating parameters.`);
             state.night++;
             switchScreen('mainMenu');
         }
 
-        function gameOver(reason) {
+        // ==========================================================================
+        // 🚨 NEW REWRITTEN HORROR GAME OVER ENGINE (NO ALERTS)
+        // ==========================================================================
+        function triggerGameOverTerminal(reason, playJumpscare, faceSymbol = "👹") {
             state.isGameOver = true;
+            
+            // Immediately lock down background clocks
             clearInterval(state.clockInterval);
             clearInterval(state.AIInterval);
-            clearInterval(state.powerInterval);
-            
+            clearInterval(state.psychicInterval);
             for(let i = 1; i <= 4; i++) clearTimeout(rooms[i].killTimer);
-            
-            alert(`--- CONTRACT TERMINATION REPORT ---\n\nReason: ${reason}\n\nSurvived until ${ui.time.innerText} on Shift ${state.night}.`);
-            switchScreen('mainMenu');
+
+            ui.deathLog.innerText = `${reason}\n\n[LOG: SHIFT ${state.night} // TIME ELAPSED: ${ui.time.innerText}]`;
+
+            if (playJumpscare) {
+                // Populate the scare screen with the specific anomaly face symbol
+                ui.scareMonster.innerText = faceSymbol;
+                ui.jumpscare.style.display = "flex";
+
+                // Play intense strobe sequence for 1.5s before going to the dedicated Death Interface
+                setTimeout(() => {
+                    ui.jumpscare.style.display = "none";
+                    switchScreen('deathScreen');
+                }, 1500);
+            } else {
+                switchScreen('deathScreen');
+            }
         }
 
-        // Keyboard Inputs Mapping Execution
+        // Functional Keyboard Matrix Keydown Event Assignment
         document.addEventListener('keydown', (e) => {
-            if (!document.getElementById('gameScreen').classList.contains('active') || state.isGameOver) return;
+            if (state.isGameOver) return; // Completely freeze control lines on termination
+            if (!document.getElementById('gameScreen').classList.contains('active')) return;
+            
             const key = e.key.toLowerCase();
             let room = rooms[state.currentCam];
             
-            // Router manual override mashing mechanics
+            if (key === 'c') {
+                triggerCoffeeProcess();
+                return;
+            }
+
             if (key === 'r' && room.isJammed) {
-                room.jamPct += (state.night >= 5 ? 8 : 15); // Harder to clear on Night 5
+                room.jamPct += (state.night >= 5 ? 8 : 15);
                 if (room.jamPct >= 100) {
                     room.isJammed = false;
                     room.jamPct = 0;
@@ -590,7 +732,7 @@
                 return;
             }
 
-            if (room.isJammed) return; // Prevent other commands when hardware is down
+            if (room.isJammed) return;
 
             if (key === '1') switchCamera(1);
             if (key === '2') switchCamera(2);

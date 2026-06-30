@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vet Ward: Anomaly - Full System</title>
+    <title>WARD 4: ABSOLUTE INSANITY</title>
     <style>
-        /* --- CORE STYLES --- */
         :root {
-            --crt-green: #2fff00;
-            --crt-dark: #0f3300;
-            --bg-color: #030303;
-            --panel-bg: #111;
+            --crt-green: #33ff33;
+            --crt-amber: #ffb000;
+            --bg-color: #020203;
+            --panel-bg: #0a0a0c;
+            --alert-red: #ff0033;
         }
 
         body, html {
@@ -19,116 +19,150 @@
             height: 100%; display: flex; justify-content: center; align-items: center;
         }
 
-        .screen { display: none; width: 100%; max-width: 1000px; height: 700px; position: relative; }
+        .screen { display: none; width: 100%; max-width: 1150px; height: 750px; position: relative; }
         .active { display: flex; flex-direction: column; }
 
-        /* --- MENUS --- */
+        /* --- UI WORKSPACES --- */
         .menu-wrapper {
-            background: #0a0a0a; border: 2px solid #333; width: 100%; height: 100%;
+            background: #040406; border: 4px double #222; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        h1 { color: red; font-size: 40px; letter-spacing: 5px; text-shadow: 0 0 10px darkred; }
-        .menu-box { background: var(--panel-bg); padding: 30px; border: 1px solid #444; width: 400px; text-align: center; }
+        h1 { color: var(--alert-red); font-size: 46px; letter-spacing: 8px; text-shadow: 0 0 20px #500; margin: 0; }
+        .subtitle { color: #555; font-size: 13px; margin-bottom: 40px; letter-spacing: 2px; }
+        .menu-box { background: var(--panel-bg); padding: 40px; border: 1px solid #222; width: 480px; text-align: center; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
         
         button {
-            background: #222; color: white; border: 1px solid #555; padding: 12px 20px;
-            font-size: 16px; font-weight: bold; cursor: pointer; margin: 10px 0; width: 100%; transition: 0.3s;
+            background: #111; color: #888; border: 1px solid #333; padding: 14px 20px;
+            font-size: 14px; font-weight: bold; cursor: pointer; margin: 8px 0; width: 100%; transition: all 0.15s ease;
         }
-        button:hover { background: white; color: black; box-shadow: 0 0 10px white; }
-        button:disabled { background: #111; color: #444; border-color: #222; cursor: not-allowed; box-shadow: none; }
+        button:hover:not(:disabled) { background: var(--crt-green); color: black; box-shadow: 0 0 15px var(--crt-green); border-color: var(--crt-green); }
+        button:disabled { background: #050505; color: #222; border-color: #111; cursor: not-allowed; }
 
-        /* --- IN-GAME HUD --- */
+        /* --- DASHBOARD HEADERS --- */
         .game-container {
-            display: grid; grid-template-columns: 3fr 1fr; grid-template-rows: auto 1fr;
-            width: 100%; height: 100%; background: #000; border: 4px solid #222; gap: 5px;
+            display: grid; grid-template-columns: 800px 1fr; grid-template-rows: 65px 1fr;
+            width: 100%; height: 100%; background: #000; border: 3px solid #15151c;
         }
 
         .header-bar {
-            grid-column: 1 / 3; background: #111; border-bottom: 2px solid #333;
-            display: flex; justify-content: space-between; padding: 15px 30px; font-size: 20px;
-            color: var(--crt-green); text-shadow: 0 0 5px var(--crt-green);
+            grid-column: 1 / 3; background: #07070a; border-bottom: 2px solid #15151c;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font-size: 20px;
+            color: var(--crt-green); text-shadow: 0 0 4px var(--crt-green); font-weight: bold;
         }
 
-        /* --- CAMERA FEED --- */
+        /* --- SIMULATED CCTV FEED --- */
         .camera-section {
-            position: relative; background: #050505; border: 2px solid #333;
+            position: relative; background: #010102; border-right: 2px solid #15151c;
             display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
-        .crt-effect {
+        .crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px; z-index: 10; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+            background-size: 100% 6px; z-index: 10; pointer-events: none;
         }
 
-        .cam-label { position: absolute; top: 15px; left: 15px; z-index: 11; font-size: 24px; color: white; font-weight: bold; }
-        .record-dot { color: red; animation: blink 1s infinite; }
+        .cam-label { position: absolute; top: 20px; left: 20px; z-index: 12; font-size: 18px; color: #fff; font-weight: bold; background: rgba(0,0,0,0.8); padding: 6px 12px; border: 1px solid #333; }
+        .danger-alert { color: var(--alert-red); animation: pulse 0.4s infinite alternate; font-weight: bold; display: none; margin-left: 15px;}
+        .record-dot { color: var(--alert-red); animation: blink 1s infinite; }
 
-        /* --- PATIENTS & ANOMALIES --- */
-        .patient-display { font-size: 150px; position: relative; z-index: 5; transition: 0.2s; }
+        /* --- TARGET ENTITY --- */
+        .patient-display { font-size: 180px; position: relative; z-index: 5; transition: transform 0.05s; }
         
+        /* --- CORE VISUAL SCANNER --- */
+        .scanner-beam {
+            position: absolute; top: -10px; left: 0; width: 100%; height: 20px;
+            background: rgba(51, 255, 51, 0.3); box-shadow: 0 0 25px var(--crt-green);
+            z-index: 15; pointer-events: none; display: none;
+        }
+        .scanning .scanner-beam { animation: scanMove 1.4s linear infinite; display: block; }
+
+        @keyframes scanMove { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+
+        /* --- CRITICAL HORROR ANIMATIONS --- */
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
-        @keyframes twitch {
-            0% { transform: translate(0, 0); } 20% { transform: translate(-15px, 10px) rotate(5deg); }
-            40% { transform: translate(15px, -15px) rotate(-5deg); } 60% { transform: translate(-10px, -10px); }
-            80% { transform: translate(10px, 15px) rotate(3deg); } 100% { transform: translate(0, 0); }
+        @keyframes pulse { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+        @keyframes microTwitch {
+            0% { transform: translate(0, 0); } 25% { transform: translate(-15px, 12px) scale(1.1); }
+            50% { transform: translate(15px, -15px) rotate(6deg); } 75% { transform: translate(-12px, -8px) rotate(-6deg); }
+            100% { transform: translate(0, 0); }
         }
-        @keyframes flicker {
-            0% { background: #050505; } 10% { background: #222; } 20% { background: #000; }
-            30% { background: #300; } 100% { background: #050505; }
-        }
-
-        .anim-twitch { animation: twitch 0.15s infinite; filter: contrast(200%) grayscale(50%); }
-        .anim-flicker { animation: flicker 0.3s infinite; }
-
-        /* --- CONTROL PANEL --- */
-        .control-panel {
-            background: #111; border-left: 2px solid #333; padding: 20px; display: flex; flex-direction: column;
+        @keyframes systemShatter {
+            0% { opacity: 1; background: #000; filter: hue-rotate(0deg); }
+            10% { opacity: 0.1; background: #200; }
+            20% { opacity: 0.8; filter: invert(1); }
+            30% { opacity: 0.2; }
+            40% { opacity: 1; filter: hue-rotate(180deg); }
+            100% { opacity: 1; background: #000; }
         }
 
-        .cam-buttons { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .cam-btn { width: 48%; padding: 15px 0; font-size: 18px; }
-        .cam-btn.active-cam { background: var(--crt-green); color: black; font-weight: bold; }
+        .anim-twitch { animation: microTwitch 0.08s infinite !important; }
+        .anim-flicker { animation: systemShatter 0.15s infinite; }
 
-        .action-btn { font-size: 20px; padding: 20px; margin-bottom: 10px; border: 2px solid; }
+        /* --- SYSTEM JAM / REBOOT OVERLAY --- */
+        .jam-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050000; color: var(--alert-red); z-index: 18;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            font-size: 28px; font-weight: bold; font-family: monospace;
+        }
+        .jam-prompt { font-size: 16px; color: #666; margin-top: 15px; animation: blink 0.8s infinite; }
+
+        /* --- SIDE OPERATIONAL PANEL --- */
+        .control-panel { background: var(--panel-bg); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .cam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .cam-btn { padding: 12px 0; font-size: 14px; margin: 0; text-align: center; }
+        .cam-btn.active-cam { background: var(--crt-green); color: black; font-weight: bold; border-color: var(--crt-green); }
+
+        .action-btn { font-size: 16px; padding: 16px; margin-top: 8px; border: 2px solid; font-weight: bold; }
         .btn-treat { border-color: #00ff00; color: #00ff00; }
-        .btn-treat:hover { background: #00ff00; color: black; }
-        .btn-shut { border-color: red; color: red; }
-        .btn-shut:hover { background: red; color: white; }
+        .btn-shut { border-color: var(--alert-red); color: var(--alert-red); }
+        .btn-scan-action { border-color: cyan; color: cyan; }
 
-        .ref-photo {
-            margin-top: auto; padding: 15px; background: #000; border: 1px solid #444;
-            text-align: center; color: #aaa; font-size: 14px;
+        /* --- INTEGRATED SCAN MATRIX --- */
+        .scanner-dash {
+            background: #030305; border: 1px solid #1a1a24; padding: 15px; margin: 10px 0;
+            font-size: 11px; color: #666; line-height: 1.6;
         }
-        .ref-emoji { font-size: 50px; margin-top: 10px; filter: grayscale(100%); }
+        .dash-line { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .val-clear { color: var(--crt-green); font-weight: bold; }
+        .val-anomaly { color: var(--alert-red); font-weight: bold; animation: blink 0.4s infinite; }
 
-        /* --- SHUTTER DOOR --- */
+        .ref-photo { padding: 10px; background: #020203; border: 1px solid #15151c; text-align: center; color: #444; font-size: 11px; }
+        .ref-emoji { font-size: 36px; margin-top: 4px; filter: grayscale(100%) opacity(0.3); }
+
+        /* --- AUTOMATED SHUTTER ASSEMBLY --- */
         .shutter-door {
             position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, #111, #111 20px, #000 20px, #000 40px);
-            border-bottom: 30px solid #333; z-index: 20; transition: top 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+            background: linear-gradient(180deg, #101015 0%, #050508 95%, #33ff33 100%);
+            border-bottom: 20px solid #222; z-index: 25; transition: top 0.1s ease-in;
         }
         .shutter-door.closed { top: 0; }
         
-        .sys-msg { position: absolute; z-index: 30; font-size: 30px; font-weight: bold; display: none; }
+        .sys-toast {
+            position: absolute; z-index: 30; font-size: 22px; font-weight: bold;
+            background: black; padding: 12px 25px; border: 2px solid; display: none;
+            text-align: center; box-shadow: 0 0 25px rgba(0,0,0,0.9);
+        }
 
-        /* --- MULTIPLAYER MOCK --- */
-        .multiplayer-box { margin-top: 20px; padding: 15px; border: 1px dashed #555; background: #000; }
-        input[type="text"] { width: 80%; padding: 10px; background: #222; color: white; border: 1px solid #555; text-align: center; }
-
+        .danger-zone-alert {
+            background: rgba(255, 0, 51, 0.15); border: 1px solid var(--alert-red); padding: 8px;
+            color: #ff6666; font-size: 11px; font-weight: bold; text-align: center; margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
 
     <div id="mainMenu" class="screen active">
         <div class="menu-wrapper">
-            <h1>ANOMALY: VET WARD</h1>
+            <h1>WARD 4: SYSTEM BREAKDOWN</h1>
+            <div class="subtitle">CRITICAL FACILITY HARDENING IN PROGRESS</div>
             <div class="menu-box">
-                <button onclick="switchScreen('shopMenu')">ENTER SHOP</button>
-                <div class="multiplayer-box">
-                    <h3>SERVER CONNECTION</h3>
-                    <input type="text" id="serverCode" placeholder="Enter Room Code (Simulated)">
-                    <button onclick="startGame()">CONNECT & START NIGHT</button>
+                <button onclick="switchScreen('shopMenu')">ACCESS PROPERTY LOCKER</button>
+                <div style="margin: 15px 0; border: 1px dashed #333; padding: 15px; background: #000;">
+                    <div style="font-size: 11px; color: #555; margin-bottom: 10px;">ENCRYPTED SECTOR LOBBY MOCK</div>
+                    <input type="text" id="serverCode" placeholder="SYS_CONFIG_HEX" style="width: 75%; padding: 10px; background: #08080c; color: var(--alert-red); border: 1px solid #222; text-align: center; font-family: monospace; font-size: 15px;">
+                    <button onclick="startGame()" style="margin-top: 12px;">EXECUTE DEPLOYMENT</button>
                 </div>
             </div>
         </div>
@@ -136,50 +170,79 @@
 
     <div id="shopMenu" class="screen">
         <div class="menu-wrapper">
-            <h1 style="color: gold;">SUPPLY CLOSET</h1>
+            <h1 style="color: var(--crt-amber); text-shadow: 0 0 10px rgba(255,176,0,0.3);">MARKETPLACE HARDWARE</h1>
             <div class="menu-box">
-                <h3 style="color: var(--crt-green)">Available Credits: <span id="shopCredits">0</span> CR</h3>
-                <hr style="border-color: #333;">
-                <button id="btnBuyScanner" onclick="buyItem('scanner', 50)">Buy Auto-Scanner (50 CR)</button>
-                <button id="btnBuyBattery" onclick="buyItem('battery', 100)">Buy Backup Battery (100 CR)</button>
-                <p id="shopMsg" style="color: #aaa;"></p>
-                <button onclick="switchScreen('mainMenu')" style="margin-top: 30px;">BACK TO MENU</button>
+                <h3 style="color: var(--crt-green)">Firmware Allocation: <span id="shopCredits">0</span> CR</h3>
+                <hr style="border-color: #15151c;">
+                <button id="btnBuyScanner" onclick="buyItem('scanner', 20)">Buy Core Bio-Scanner Mod (20 CR)</button>
+                <button id="btnBuyRegen" onclick="buyItem('regen', 60)">Buy Grid Core Optimizer [Slower Power Drain] (60 CR)</button>
+                <p id="shopMsg" style="color: #666; min-height: 18px; margin: 10px 0; font-size: 12px;"></p>
+                <button onclick="switchScreen('mainMenu')" style="margin-top: 20px; border-color: #333;">DISCONNECT</button>
             </div>
         </div>
     </div>
 
     <div id="gameScreen" class="screen">
-        <div class="game-container">
+        <div class="game-container" id="gameFrame">
             
             <div class="header-bar">
-                <span id="hudNight">NIGHT: 1</span>
+                <span id="hudNight">SHIFT: 1</span>
                 <span id="hudTime">12:00 AM</span>
+                <span id="hudPower" style="color: var(--crt-amber);">POWER GRID: 100%</span>
                 <span id="hudCredits">CREDITS: 0 CR</span>
             </div>
 
-            <div class="camera-section" id="camView">
-                <div class="crt-effect"></div>
-                <div class="cam-label"><span class="record-dot">●</span> <span id="camText">CAM 01 - WARD A</span></div>
+            <div class="camera-section" id="camViewport">
+                <div class="crt-overlay"></div>
+                <div class="scanner-beam" id="scannerLaser"></div>
                 
+                <div class="cam-label">
+                    <span class="record-dot">●</span> <span id="camText">CAM 01 // AREA A</span>
+                    <span class="danger-alert" id="hudDanger">⚠️ BREACH DETECTED</span>
+                </div>
+                
+                <div class="jam-overlay" id="jamScreen">
+                    <div>[FEED CORRUPTED]</div>
+                    <div class="jam-prompt">MASH [R] KEY TO REBOOT ROUTER (<span id="jamProgress">0</span>%)</div>
+                </div>
+
                 <div class="patient-display" id="patientEntity">🐶</div>
                 <div class="shutter-door" id="shutter"></div>
                 
-                <div class="sys-msg" id="systemMessage">ACTION LOG</div>
+                <div class="sys-toast" id="toastMessage">CONSOLE LOG</div>
             </div>
 
             <div class="control-panel">
-                <div class="cam-buttons">
-                    <button class="cam-btn active-cam" id="btnCam1" onclick="switchCamera(1)">CAM 1</button>
-                    <button class="cam-btn" id="btnCam2" onclick="switchCamera(2)">CAM 2</button>
+                <div>
+                    <div id="insanityWarning" class="danger-zone-alert" style="display:none;">
+                        💀 NIGHTMARE MATRIX ACTIVE 💀<br>EXPECT IMMEDIATE PARALLEL BREAKS
+                    </div>
+
+                    <div class="cam-grid">
+                        <button class="cam-btn active-cam" id="btnCam1" onclick="switchCamera(1)">CAM 1</button>
+                        <button class="cam-btn" id="btnCam2" onclick="switchCamera(2)">CAM 2</button>
+                        <button class="cam-btn" id="btnCam3" onclick="switchCamera(3)">CAM 3</button>
+                        <button class="cam-btn" id="btnCam4" onclick="switchCamera(4)">CAM 4</button>
+                    </div>
+
+                    <div class="scanner-dash">
+                        <div style="text-align: center; border-bottom: 1px solid #15151c; padding-bottom: 4px; margin-bottom: 6px; font-weight: bold; color: #aaa;">BIOSTATISTICAL METRICS</div>
+                        <div class="dash-line"><span>CELL MUTATION:</span> <span id="scanDna">OFFLINE</span></div>
+                        <div class="dash-line"><span>MOTOR REFLEXES:</span> <span id="scanNeuro">OFFLINE</span></div>
+                        <div class="dash-line"><span>LUX DISCREPANCY:</span> <span id="scanLumen">OFFLINE</span></div>
+                    </div>
+
+                    <button class="action-btn btn-scan-action" id="btnScanner" onclick="executeScan()" disabled>RUN BIO-SCAN [Space]</button>
                 </div>
 
-                <button class="action-btn btn-treat" onclick="handleAction('treat')">TREAT PATIENT [T]</button>
-                <button class="action-btn btn-shut" onclick="handleAction('shut')">SHUTTER DOOR [E]</button>
-                <button class="action-btn" id="btnScanner" onclick="useScanner()" disabled>RUN SCANNER [Space]</button>
+                <div>
+                    <button class="action-btn btn-treat" onclick="handleAction('treat')">EXECUTE REMEDY [T]</button>
+                    <button class="action-btn btn-shut" onclick="handleAction('shut')">ENGAGE CONCEALMENT [E]</button>
 
-                <div class="ref-photo">
-                    <div>REFERENCE FILE</div>
-                    <div class="ref-emoji" id="referencePhoto">🐶</div>
+                    <div class="ref-photo" style="margin-top: 12px;">
+                        <div>ARCHIVED BLUEPRINT FILE</div>
+                        <div class="ref-emoji" id="referencePhoto">🐶</div>
+                    </div>
                 </div>
             </div>
 
@@ -187,45 +250,50 @@
     </div>
 
     <script>
-        // --- GAME STATE ---
         let state = {
-            credits: 0, night: 1, time: 12, am: true,
-            hasScanner: false, scannerCooldown: false,
-            currentCam: 1, isGameOver: false, clockInterval: null, anomalyTimeout: null
+            credits: 0, night: 1, time: 12, power: 100,
+            hasScanner: false, optimizedRegen: false, isScanning: false,
+            currentCam: 1, isGameOver: false,
+            clockInterval: null, AIInterval: null, powerInterval: null
         };
 
-        // --- ENTITY DATA ---
-        const normalAnimals = ["🐶", "🐱", "🐰", "🐹", "🐷"];
-        const anomalyFaces = ["🐺", "👹", "💀", "👁️", "🕷️", "🕳️", "🤡"];
+        const normalAnimals = ["🐶", "🐱", "🐰", "🐹", "🦊", "🐼", "🦁"];
+        const anomalyFaces = ["🐺", "👹", "💀", "👁️", "🕷️", "🤡", "👻"];
         
         let rooms = {
-            1: { active: true, isAnomaly: false, baseAnimal: "🐶", currentDisplay: "🐶", type: "none" },
-            2: { active: true, isAnomaly: false, baseAnimal: "🐱", currentDisplay: "🐱", type: "none" }
+            1: { isAnomaly: false, baseAnimal: "🐶", currentDisplay: "🐶", type: "none", killTimer: null, isJammed: false, jamPct: 0 },
+            2: { isAnomaly: false, baseAnimal: "🐱", currentDisplay: "🐱", type: "none", killTimer: null, isJammed: false, jamPct: 0 },
+            3: { isAnomaly: false, baseAnimal: "🐰", currentDisplay: "🐰", type: "none", killTimer: null, isJammed: false, jamPct: 0 },
+            4: { isAnomaly: false, baseAnimal: "🐹", currentDisplay: "🐹", type: "none", killTimer: null, isJammed: false, jamPct: 0 }
         };
 
-        // --- DOM ELEMENTS ---
         const ui = {
             screens: document.querySelectorAll('.screen'),
             time: document.getElementById('hudTime'),
             night: document.getElementById('hudNight'),
+            power: document.getElementById('hudPower'),
             credits: document.getElementById('hudCredits'),
             shopCredits: document.getElementById('shopCredits'),
             patient: document.getElementById('patientEntity'),
             camText: document.getElementById('camText'),
             shutter: document.getElementById('shutter'),
-            camView: document.getElementById('camView'),
+            camViewport: document.getElementById('camViewport'),
             refPhoto: document.getElementById('referencePhoto'),
-            sysMsg: document.getElementById('systemMessage'),
-            btnCam1: document.getElementById('btnCam1'),
-            btnCam2: document.getElementById('btnCam2'),
-            btnScanner: document.getElementById('btnScanner')
+            toast: document.getElementById('toastMessage'),
+            danger: document.getElementById('hudDanger'),
+            jamScreen: document.getElementById('jamScreen'),
+            jamProgress: document.getElementById('jamProgress'),
+            btnScanner: document.getElementById('btnScanner'),
+            nWarning: document.getElementById('insanityWarning'),
+            scanDna: document.getElementById('scanDna'),
+            scanNeuro: document.getElementById('scanNeuro'),
+            scanLumen: document.getElementById('scanLumen')
         };
 
-        // --- NAVIGATION ---
-        function switchScreen(screenId) {
+        function switchScreen(id) {
             ui.screens.forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            if(screenId === 'shopMenu') ui.shopCredits.innerText = state.credits;
+            document.getElementById(id).classList.add('active');
+            if(id === 'shopMenu') ui.shopCredits.innerText = state.credits;
         }
 
         function buyItem(item, cost) {
@@ -234,191 +302,261 @@
                 state.credits -= cost;
                 ui.shopCredits.innerText = state.credits;
                 if (item === 'scanner') { state.hasScanner = true; document.getElementById('btnBuyScanner').disabled = true; }
-                msg.innerText = "Purchase successful.";
+                if (item === 'regen') { state.optimizedRegen = true; document.getElementById('btnBuyRegen').disabled = true; }
+                msg.innerText = "UPGRADE LOGGED TO STATION MATRIX.";
                 msg.style.color = "var(--crt-green)";
             } else {
-                msg.innerText = "Insufficient Credits.";
-                msg.style.color = "red";
+                msg.innerText = "TRANSACTION ERROR: INSUFFICIENT ALLOCATION.";
+                msg.style.color = "var(--alert-red)";
             }
         }
 
-        // --- CORE LOOP ---
         function startGame() {
-            state.time = 12; state.am = true; state.isGameOver = false;
-            ui.night.innerText = `NIGHT: ${state.night}`;
+            state.time = 12; state.power = 100; state.isGameOver = false; state.isScanning = false;
+            ui.night.innerText = `SHIFT: ${state.night}`;
             ui.credits.innerText = `CREDITS: ${state.credits} CR`;
             ui.btnScanner.disabled = !state.hasScanner;
+
+            if (state.night >= 5) {
+                ui.nWarning.style.display = "block";
+                document.getElementById("gameFrame").style.borderColor = "var(--alert-red)";
+            } else {
+                ui.nWarning.style.display = "none";
+                document.getElementById("gameFrame").style.borderColor = "#15151c";
+            }
             
             generateRooms();
             switchScreen('gameScreen');
+            clearReadout();
             updateDisplay();
             
-            // Start clock (1 in-game hour = 10 real seconds)
+            // Core Clock tick (1 hr = 12 seconds real-time)
             clearInterval(state.clockInterval);
-            state.clockInterval = setInterval(advanceTime, 10000);
+            state.clockInterval = setInterval(advanceTime, 12000);
 
-            // Start Anomaly AI
-            scheduleAnomaly();
+            // AI Deployment Frequency Loop
+            clearInterval(state.AIInterval);
+            let loopSpeed = state.night >= 5 ? 1500 : 4000 - (state.night * 500);
+            state.AIInterval = setInterval(directorAILoop, loopSpeed);
+
+            // Power Drain Loop Ticks
+            clearInterval(state.powerInterval);
+            state.powerInterval = setInterval(managePowerGrid, 1000);
         }
 
         function advanceTime() {
             if(state.isGameOver) return;
             state.time++;
             if (state.time > 12) state.time = 1;
-            
-            let timeString = state.time + (state.time >= 1 && state.time <= 5 ? " AM" : (state.time === 12 ? " AM" : " PM"));
-            ui.time.innerText = timeString;
-
+            ui.time.innerText = state.time + " AM";
             if (state.time === 6) winNight();
         }
 
-        // --- ANOMALY AI ---
-        function scheduleAnomaly() {
-            if(state.isGameOver) return;
-            clearTimeout(state.anomalyTimeout);
-            
-            // Random delay between 4s and 10s (gets faster on later nights)
-            let delay = Math.random() * (10000 - (state.night * 1000)) + 4000;
-            state.anomalyTimeout = setTimeout(triggerAnomaly, delay);
+        function managePowerGrid() {
+            if (state.isGameOver) return;
+
+            // Idle camera draw + shutter costs
+            let totalDrain = 1;
+            if (document.getElementById('shutter').classList.contains('closed')) totalDrain += 4;
+            if (state.isScanning) totalDrain += 3;
+            if (state.optimizedRegen) totalDrain -= 0.5;
+
+            state.power -= totalDrain;
+            if (state.power < 0) state.power = 0;
+            ui.power.innerText = `POWER GRID: ${Math.floor(state.power)}%`;
+
+            if (state.power <= 0) {
+                gameOver("POWER SYSTEM COLLAPSED. Facility life support and security doors dropped offline.");
+            }
         }
 
-        function triggerAnomaly() {
+        function directorAILoop() {
             if(state.isGameOver) return;
-            
-            // Pick random room
-            let targetRoom = Math.floor(Math.random() * 2) + 1;
-            let room = rooms[targetRoom];
 
-            // 60% chance to spawn anomaly if room is normal
-            if (!room.isAnomaly && Math.random() > 0.4) {
-                room.isAnomaly = true;
+            let targetId = Math.floor(Math.random() * 4) + 1;
+            let room = rooms[targetId];
+
+            if (!room.isAnomaly) {
+                let spawnChance = state.night >= 5 ? 0.85 : 0.25 + (state.night * 0.10);
                 
-                let anomalyType = Math.floor(Math.random() * 3);
-                if (anomalyType === 0) {
-                    room.currentDisplay = anomalyFaces[Math.floor(Math.random() * anomalyFaces.length)];
-                    room.type = "face";
-                } else if (anomalyType === 1) {
-                    room.type = "twitch";
-                } else {
-                    room.type = "flicker";
-                }
+                if (Math.random() < spawnChance) {
+                    room.isAnomaly = true;
+                    
+                    // High-tier shifts jam camera feed hardware automatically
+                    if (state.night >= 3 && Math.random() > 0.4) {
+                        room.isJammed = true;
+                        room.jamPct = 0;
+                    }
 
-                // If anomaly isn't dealt with in 8 seconds, you die
-                room.killTimer = setTimeout(() => { gameOver("An anomaly breached your defenses."); }, 8000 - (state.night * 500));
+                    let anomalyType = Math.floor(Math.random() * 3);
+                    if (anomalyType === 0) {
+                        room.currentDisplay = anomalyFaces[Math.floor(Math.random() * anomalyFaces.length)];
+                        room.type = "face";
+                    } else if (anomalyType === 1) {
+                        room.type = "twitch";
+                    } else {
+                        room.type = "flicker";
+                    }
+
+                    // Calculation for aggressive containment window
+                    let timeWindow = Math.max(1800, 7000 - (state.night * 1100)); 
+
+                    room.killTimer = setTimeout(() => { 
+                        gameOver(`Breach occurred on Cam ${targetId}. Subject escaped containment parameters.`); 
+                    }, timeWindow);
+
+                    if (state.currentCam === targetId) updateDisplay();
+                }
             }
-            
-            updateDisplay();
-            scheduleAnomaly(); // Queue next event
         }
 
         function generateRooms() {
-            rooms[1].baseAnimal = normalAnimals[Math.floor(Math.random() * normalAnimals.length)];
-            rooms[1].currentDisplay = rooms[1].baseAnimal;
-            rooms[1].isAnomaly = false; rooms[1].type = "none";
-            clearTimeout(rooms[1].killTimer);
-
-            rooms[2].baseAnimal = normalAnimals[Math.floor(Math.random() * normalAnimals.length)];
-            rooms[2].currentDisplay = rooms[2].baseAnimal;
-            rooms[2].isAnomaly = false; rooms[2].type = "none";
-            clearTimeout(rooms[2].killTimer);
+            for (let i = 1; i <= 4; i++) {
+                clearTimeout(rooms[i].killTimer);
+                rooms[i].baseAnimal = normalAnimals[Math.floor(Math.random() * normalAnimals.length)];
+                rooms[i].currentDisplay = rooms[i].baseAnimal;
+                rooms[i].isAnomaly = false;
+                rooms[i].type = "none";
+                rooms[i].isJammed = false;
+                rooms[i].jamPct = 0;
+            }
         }
 
-        // --- CAMERA & UI UPDATES ---
-        function switchCamera(camId) {
-            state.currentCam = camId;
-            ui.btnCam1.classList.toggle('active-cam', camId === 1);
-            ui.btnCam2.classList.toggle('active-cam', camId === 2);
-            ui.camText.innerText = camId === 1 ? "CAM 01 - WARD A" : "CAM 02 - WARD B";
+        function switchCamera(id) {
+            if (state.isScanning || state.isGameOver) return;
+            state.currentCam = id;
+            
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`btnCam${i}`).classList.toggle('active-cam', i === id);
+            }
+            
+            ui.camText.innerText = `CAM 0${id} // AREA ${String.fromCharCode(64 + id)}`;
+            clearReadout();
             updateDisplay();
+            state.power -= 0.5; // Switch cost penalty
         }
 
         function updateDisplay() {
             let room = rooms[state.currentCam];
-            
-            // Reset visual effects
             ui.patient.className = "patient-display";
-            ui.camView.classList.remove("anim-flicker");
+            ui.camViewport.classList.remove("anim-flicker");
+            
+            // Toggle router jamming visual systems
+            if (room.isJammed) {
+                ui.jamScreen.style.display = "flex";
+                ui.jamProgress.innerText = room.jamPct;
+            } else {
+                ui.jamScreen.style.display = "none";
+            }
 
-            // Apply room state
             ui.patient.innerText = room.currentDisplay;
             ui.refPhoto.innerText = room.baseAnimal;
 
             if (room.isAnomaly) {
+                ui.danger.style.display = "inline";
                 if (room.type === "twitch") ui.patient.classList.add("anim-twitch");
-                if (room.type === "flicker") ui.camView.classList.add("anim-flicker");
+                if (room.type === "flicker") ui.camViewport.classList.add("anim-flicker");
+            } else {
+                ui.danger.style.display = "none";
             }
         }
 
-        // --- ACTIONS ---
+        function executeScan() {
+            if (!state.hasScanner || state.isScanning || state.isGameOver || rooms[state.currentCam].isJammed) return;
+            
+            state.isScanning = true;
+            ui.btnScanner.disabled = true;
+            ui.camViewport.classList.add("scanning");
+            
+            ui.scanDna.innerText = "CALIBRATING..."; ui.scanDna.style.color = "cyan";
+            ui.scanNeuro.innerText = "CALIBRATING..."; ui.scanNeuro.style.color = "cyan";
+            ui.scanLumen.innerText = "CALIBRATING..."; ui.scanLumen.style.color = "cyan";
+
+            setTimeout(() => {
+                ui.camViewport.classList.remove("scanning");
+                state.isScanning = false;
+                if (state.hasScanner) ui.btnScanner.disabled = false;
+
+                let room = rooms[state.currentCam];
+                
+                if (room.isAnomaly) {
+                    ui.scanDna.innerText = room.type === "face" ? "MUTATED PROFILE" : "NOMINAL";
+                    ui.scanDna.className = room.type === "face" ? "val-anomaly" : "val-clear";
+                    
+                    ui.scanNeuro.innerText = room.type === "twitch" ? "NEUROLOGICAL VOLTAGE SPIKE" : "NOMINAL";
+                    ui.scanNeuro.className = room.type === "twitch" ? "val-anomaly" : "val-clear";
+                    
+                    ui.scanLumen.innerText = room.type === "flicker" ? "WAVELENGTH DROP IN ROOM" : "NOMINAL";
+                    ui.scanLumen.className = room.type === "flicker" ? "val-anomaly" : "val-clear";
+                } else {
+                    ui.scanDna.innerText = "NOMINAL"; ui.scanDna.className = "val-clear";
+                    ui.scanNeuro.innerText = "NOMINAL"; ui.scanNeuro.className = "val-clear";
+                    ui.scanLumen.innerText = "NOMINAL"; ui.scanLumen.className = "val-clear";
+                }
+            }, 1000);
+        }
+
+        function clearReadout() {
+            ui.scanDna.innerText = "OFFLINE"; ui.scanDna.className = ""; ui.scanDna.style.color = "#444";
+            ui.scanNeuro.innerText = "OFFLINE"; ui.scanNeuro.className = ""; ui.scanNeuro.style.color = "#444";
+            ui.scanLumen.innerText = "OFFLINE"; ui.scanLumen.className = ""; ui.scanLumen.style.color = "#444";
+        }
+
         function handleAction(action) {
+            if (state.isGameOver || state.isScanning || rooms[state.currentCam].isJammed) return;
             let room = rooms[state.currentCam];
             
             if (action === 'shut') {
-                triggerShutter();
+                triggerShutterDrop();
                 if (room.isAnomaly) {
-                    showSystemMsg("ANOMALY PURGED +20CR", "var(--crt-green)");
-                    state.credits += 20;
-                    resetRoom(state.currentCam);
+                    showToast("CONTAINMENT PURGE EXECUTED", "#00ff00");
+                    state.credits += (state.night >= 5 ? 50 : 25);
+                    clearRoomState(state.currentCam);
                 } else {
-                    gameOver("You crushed a healthy animal. You are fired.");
+                    gameOver("SYSTEM VIOLATION. You dropped a hydraulic blast shield onto a valid domestic animal.");
                 }
             } 
             else if (action === 'treat') {
                 if (!room.isAnomaly) {
-                    showSystemMsg("PATIENT TREATED +10CR", "var(--crt-green)");
-                    state.credits += 10;
-                    resetRoom(state.currentCam);
+                    showToast("MEDICATION DISPENSED", "#00ff00");
+                    state.credits += 15;
+                    clearRoomState(state.currentCam);
                 } else {
-                    gameOver("You opened the cage to an anomaly. It attacked.");
+                    gameOver("CRITICAL INCIDENT. You unlocked the cage security system to vaccinate an active anomaly.");
                 }
             }
             ui.credits.innerText = `CREDITS: ${state.credits} CR`;
         }
 
-        function resetRoom(camId) {
-            let room = rooms[camId];
+        function clearRoomState(id) {
+            let room = rooms[id];
             clearTimeout(room.killTimer);
             room.isAnomaly = false;
             room.type = "none";
+            room.isJammed = false;
             room.baseAnimal = normalAnimals[Math.floor(Math.random() * normalAnimals.length)];
             room.currentDisplay = room.baseAnimal;
-            
-            // Give a 1-second delay before updating screen so they see the shutter
-            setTimeout(updateDisplay, 1000);
+            setTimeout(() => { updateDisplay(); clearReadout(); }, 600);
         }
 
-        function triggerShutter() {
+        function triggerShutterDrop() {
             ui.shutter.classList.add("closed");
-            setTimeout(() => ui.shutter.classList.remove("closed"), 1500);
+            setTimeout(() => ui.shutter.classList.remove("closed"), 1200);
         }
 
-        function useScanner() {
-            if (state.scannerCooldown) return;
-            state.scannerCooldown = true;
-            ui.btnScanner.disabled = true;
-            
-            let anomalyFound = (rooms[1].isAnomaly || rooms[2].isAnomaly);
-            showSystemMsg(anomalyFound ? "WARNING: ANOMALY DETECTED" : "SYSTEM CLEAR", anomalyFound ? "red" : "var(--crt-green)");
-            
-            setTimeout(() => { 
-                state.scannerCooldown = false; 
-                if(state.hasScanner) ui.btnScanner.disabled = false; 
-            }, 5000);
+        function showToast(text, color) {
+            ui.toast.innerText = text;
+            ui.toast.style.borderColor = color;
+            ui.toast.style.color = color;
+            ui.toast.style.display = "block";
+            setTimeout(() => ui.toast.style.display = "none", 1200);
         }
 
-        function showSystemMsg(text, color) {
-            ui.sysMsg.innerText = text;
-            ui.sysMsg.style.color = color;
-            ui.sysMsg.style.display = "block";
-            setTimeout(() => ui.sysMsg.style.display = "none", 2000);
-        }
-
-        // --- GAME OVER / WIN ---
         function winNight() {
-            state.isGameOver = true;
             clearInterval(state.clockInterval);
-            clearTimeout(state.anomalyTimeout);
-            alert(`6:00 AM - NIGHT ${state.night} SURVIVED!\n\nCredits Earned: ${state.credits}`);
+            clearInterval(state.AIInterval);
+            clearInterval(state.powerInterval);
+            alert(`--- RECOVERY MATRIX TERMINATED: 06:00 AM ---\nShift ${state.night} completely verified. Moving parameters forward.`);
             state.night++;
             switchScreen('mainMenu');
         }
@@ -426,23 +564,42 @@
         function gameOver(reason) {
             state.isGameOver = true;
             clearInterval(state.clockInterval);
-            clearTimeout(state.anomalyTimeout);
-            alert(`GAME OVER\n\n${reason}\n\nYou survived until ${ui.time.innerText} on Night ${state.night}.`);
+            clearInterval(state.AIInterval);
+            clearInterval(state.powerInterval);
+            
+            for(let i = 1; i <= 4; i++) clearTimeout(rooms[i].killTimer);
+            
+            alert(`--- CONTRACT TERMINATION REPORT ---\n\nReason: ${reason}\n\nSurvived until ${ui.time.innerText} on Shift ${state.night}.`);
             switchScreen('mainMenu');
         }
 
-        // --- KEYBOARD BINDS ---
+        // Keyboard Inputs Mapping Execution
         document.addEventListener('keydown', (e) => {
             if (!document.getElementById('gameScreen').classList.contains('active') || state.isGameOver) return;
             const key = e.key.toLowerCase();
+            let room = rooms[state.currentCam];
             
+            // Router manual override mashing mechanics
+            if (key === 'r' && room.isJammed) {
+                room.jamPct += (state.night >= 5 ? 8 : 15); // Harder to clear on Night 5
+                if (room.jamPct >= 100) {
+                    room.isJammed = false;
+                    room.jamPct = 0;
+                }
+                updateDisplay();
+                return;
+            }
+
+            if (room.isJammed) return; // Prevent other commands when hardware is down
+
             if (key === '1') switchCamera(1);
             if (key === '2') switchCamera(2);
+            if (key === '3') switchCamera(3);
+            if (key === '4') switchCamera(4);
             if (key === 't') handleAction('treat');
             if (key === 'e') handleAction('shut');
-            if (key === ' ' && state.hasScanner) { e.preventDefault(); useScanner(); }
+            if (key === ' ') { e.preventDefault(); executeScan(); }
         });
-
     </script>
 </body>
 </html>
